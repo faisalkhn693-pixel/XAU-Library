@@ -7,13 +7,22 @@ test('a numeric CVD search matches raw values in the selected 5k bucket without 
   const before=structuredClone(trade);
   assert.equal(findCvdMatches(trade,'12,345.6')[0].raw,'12,345.6');
   assert.equal(findCvdMatches(trade,'10,000')[0].field,'cvd.raw');
-  assert.equal(findCvdMatches(trade,'10–15k')[0].bucket,'10–15k');
+  assert.equal(findCvdMatches(trade,'10–15k')[0].bucket,'+10–15k');
   assert.deepEqual(trade,before);
 });
 
 test('entering 4000 matches all trades in 0–5k and excludes the next bucket',()=>{
   const trades=[{cvd:{raw:0}},{cvd:{raw:2500}},{cvd:{raw:4999}},{cvd:{raw:5000}}];
   assert.deepEqual(trades.map(t=>findCvdMatches(t,'4000').length>0),[true,true,true,false]);
+});
+
+test('signed CVD queries separate positive and negative values while unsigned queries include both',()=>{
+  const trades=[{cvd:{raw:2500}},{cvd:{raw:-2500}},{cvd:{raw:5000}},{cvd:{raw:-5000}},{cvd:{raw:0}}];
+  assert.deepEqual(trades.map(t=>findCvdMatches(t,'+4000').length>0),[true,false,false,false,false]);
+  assert.deepEqual(trades.map(t=>findCvdMatches(t,'-4000').length>0),[false,true,false,false,false]);
+  assert.deepEqual(trades.map(t=>findCvdMatches(t,'4000').length>0),[true,true,false,false,true]);
+  assert.equal(findCvdMatches(trades[0],'+0–5k')[0].bucket,'+0–5k');
+  assert.equal(findCvdMatches(trades[1],'-0-5k')[0].bucket,'-0–5k');
 });
 
 test('finds and identifies separate nested CVD moments while collapsing the observation mirror',()=>{
