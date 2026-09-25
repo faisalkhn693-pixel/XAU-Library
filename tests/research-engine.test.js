@@ -12,15 +12,17 @@ test('permanent case IDs are sequential and sequence advances past existing IDs'
   assert.equal(nextCaseSequence([],12),12);
 });
 
-test('CVD buckets advance in 5k ranges and preserve open-ended 50k+ bucket',()=>{
+test('CVD buckets advance in 5k ranges and preserve sign',()=>{
   assert.equal(cvdBucket(0),'0–5k');
-  assert.equal(cvdBucket(4999),'0–5k');
-  assert.equal(cvdBucket(5000),'5–10k');
-  assert.equal(cvdBucket(14999),'10–15k');
-  assert.equal(cvdBucket(15000),'15–20k');
-  assert.equal(cvdBucket(45000),'45–50k');
-  assert.equal(cvdBucket(50000),'50k+');
-  assert.equal(cvdBucket(-15000),'15–20k');
+  assert.equal(cvdBucket(4999),'+0–5k');
+  assert.equal(cvdBucket(5000),'+5–10k');
+  assert.equal(cvdBucket(14999),'+10–15k');
+  assert.equal(cvdBucket(15000),'+15–20k');
+  assert.equal(cvdBucket(45000),'+45–50k');
+  assert.equal(cvdBucket(50000),'+50k+');
+  assert.equal(cvdBucket(-4999),'-0–5k');
+  assert.equal(cvdBucket(-15000),'-15–20k');
+  assert.equal(cvdBucket(-50000),'-50k+');
   assert.equal(cvdBucket(''),'');
 });
 
