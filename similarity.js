@@ -1,4 +1,4 @@
-import { FIELD_WEIGHTS } from './case-model.js';
+import { cvdBucket, FIELD_WEIGHTS } from './case-model.js';
 
 const unknown = new Set(['', null, undefined, 'Unknown', 'Unclear', 'None']);
 const available = v => Array.isArray(v) ? v.filter(x => !unknown.has(x)) : unknown.has(v) ? null : v;
@@ -14,7 +14,7 @@ function featureMap(c) {
     trdDirection: c.observation?.trd?.direction ?? c.trd?.direction,
     trdType: c.observation?.trd?.type ?? c.trd?.type,
     session: c.observation?.session ?? c.session,
-    cvdBucket: c.observation?.cvd?.bucket ?? c.cvd?.bucket,
+    cvdBucket: cvdBucket(c.observation?.cvd?.raw ?? c.cvd?.raw),
   };
 }
 function compare(a, b, key) {
@@ -46,3 +46,4 @@ export function findSimilarCases(target, cases, {weights=FIELD_WEIGHTS, limit=50
     .sort((a,b)=>b.score-a.score || String(b.case.capturedAt).localeCompare(String(a.case.capturedAt)))
     .slice(0,limit);
 }
+
