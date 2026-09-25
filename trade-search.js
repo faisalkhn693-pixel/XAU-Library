@@ -35,19 +35,25 @@ export function getCvdValues(setup) {
 export function findCvdMatches(setup, query) {
   const needle = numericText(query).toLowerCase();
   if (!needle) return [];
-  let targetBucket = '';
-  const range = /^(\d+)[–-](\d+)k?$/i.exec(needle);
-  if (range) targetBucket = `${Number(range[1])}–${Number(range[2])}k`;
-  else if (/^50k\+$/i.test(needle)) targetBucket = '50k+';
+  const sign = needle.startsWith('+') ? '+' : needle.startsWith('-') ? '-' : '';
+  const unsigned = sign ? needle.slice(1) : needle;
+  let targetMagnitude = '';
+  const range = /^(\d+)[–-](\d+)k?$/i.exec(unsigned);
+  if (range) targetMagnitude = `${Number(range[1])}–${Number(range[2])}k`;
+  else if (/^\d+k\+$/i.test(unsigned)) targetMagnitude = `${Number(unsigned.slice(0,-2))}k+`;
   else {
-    const thousands = /k$/i.test(needle);
-    const numeric = thousands ? needle.slice(0, -1) : needle;
+    const thousands = /k$/i.test(unsigned);
+    const numeric = thousands ? unsigned.slice(0, -1) : unsigned;
     if (!isNumeric(numeric)) return [];
-    targetBucket = cvdBucket(Number(numeric) * (thousands ? 1000 : 1));
+    const parsed = Number(numeric) * (thousands ? 1000 : 1);
+    targetMagnitude = cvdBucket(parsed).replace(/^[+-]/, '');
   }
-  if (!targetBucket) return [];
-  return getCvdValues(setup).filter(({ raw }) => cvdBucket(numericText(raw)) === targetBucket)
-    .map(value => ({ ...value, bucket: targetBucket }));
+  if (!targetMagnitude) return [];
+  return getCvdValues(setup).filter(({ raw }) => {
+    const bucket = cvdBucket(numericText(raw));
+    const actualSign = bucket.startsWith('+') ? '+' : bucket.startsWith('-') ? '-' : '';
+    return bucket.replace(/^[+-]/, '') === targetMagnitude && (!sign || sign === actualSign);
+  }).map(value => ({ ...value, bucket: cvdBucket(numericText(value.raw)) }));
 }
 
 export function filterHistoricSetups(setups, { textQuery = '', cvdQuery = '', filter = 'All' } = {}) {
