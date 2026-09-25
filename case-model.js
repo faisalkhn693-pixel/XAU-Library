@@ -14,10 +14,12 @@ export const DEFAULT_RESEARCH_CONFIG = Object.freeze({
 
 export function cvdBucket(raw) {
   if (raw === '' || raw == null || !Number.isFinite(Number(raw))) return '';
-  const n = Math.abs(Number(raw));
-  if (n >= 50000) return '50k+';
+  const value = Number(raw), n = Math.abs(value);
+  if (n === 0) return '0–5k';
+  const sign = value > 0 ? '+' : '-';
+  if (n >= 50000) return `${sign}50k+`;
   const lower=Math.floor(n/5000)*5;
-  return `${lower}–${lower+5}k`;
+  return `${sign}${lower}–${lower+5}k`;
 }
 
 export function caseIdFor(sequence) {
