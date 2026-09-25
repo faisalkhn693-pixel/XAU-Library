@@ -1,0 +1,6 @@
+{
+  "name": "xau-library",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test-isolation=none --test tests/*.test.js" }
+}
