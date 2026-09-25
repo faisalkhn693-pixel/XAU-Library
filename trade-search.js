@@ -1,3 +1,6 @@
+
+import { cvdBucket } from './case-model.js';
+
 const numericText = value => String(value ?? '').trim().replace(/[,_\s]/g, '');
 const isNumeric = value => /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(value);
 
@@ -31,17 +34,20 @@ export function getCvdValues(setup) {
 
 export function findCvdMatches(setup, query) {
   const needle = numericText(query).toLowerCase();
-  if (!needle || !/[\d]/.test(needle)) return [];
-  const numericNeedle = isNumeric(needle) ? Number(needle) : NaN;
-  const digitNeedle = needle.replace(/\D/g, '');
-  return getCvdValues(setup).filter(({ raw }) => {
-    const normalized = numericText(raw).toLowerCase();
-    if (normalized === needle) return true;
-    if (Number.isFinite(numericNeedle) && Number(raw) === numericNeedle) return true;
-    if (normalized.includes(needle)) return true;
-    const digits = normalized.replace(/\D/g, '');
-    return digitNeedle.length > 0 && digits.includes(digitNeedle);
-  });
+  if (!needle) return [];
+  let targetBucket = '';
+  const range = /^(\d+)[–-](\d+)k?$/i.exec(needle);
+  if (range) targetBucket = `${Number(range[1])}–${Number(range[2])}k`;
+  else if (/^50k\+$/i.test(needle)) targetBucket = '50k+';
+  else {
+    const thousands = /k$/i.test(needle);
+    const numeric = thousands ? needle.slice(0, -1) : needle;
+    if (!isNumeric(numeric)) return [];
+    targetBucket = cvdBucket(Number(numeric) * (thousands ? 1000 : 1));
+  }
+  if (!targetBucket) return [];
+  return getCvdValues(setup).filter(({ raw }) => cvdBucket(numericText(raw)) === targetBucket)
+    .map(value => ({ ...value, bucket: targetBucket }));
 }
 
 export function filterHistoricSetups(setups, { textQuery = '', cvdQuery = '', filter = 'All' } = {}) {
