@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111714"><meta name="description" content="A private, offline-first XAUUSD trading journal.">
+  <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="app.css"><title>XAU Library</title>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#library" aria-label="XAU Library home"><span class="brand-mark">X</span><span>XAU <b>LIBRARY</b></span></a><span class="local-badge"><i></i> LOCAL ONLY</span></header>
+  <main id="app" class="shell">
+    <section id="view-library" class="view active"><div class="heading-row"><div><p class="eyebrow">YOUR EDGE, DOCUMENTED</p><h1>Library</h1></div><button class="primary compact" data-action="add">＋ New setup</button></div>
+      <div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Search setups, locations, notes…" aria-label="Search setups"></div>
+      <div class="filters" id="filters"></div><div id="setup-list" class="setup-list"></div>
+    </section>
+    <section id="view-add" class="view"><div class="heading-row"><div><p class="eyebrow">CAPTURE THE CONTEXT</p><h1 id="form-title">New setup</h1></div><button class="ghost" data-action="cancel">Cancel</button></div><form id="setup-form" novalidate></form></section>
+    <section id="view-stats" class="view"><div class="heading-row"><div><p class="eyebrow">REVIEW YOUR PROCESS</p><h1>Stats</h1></div></div><div id="stats-content"></div></section>
+    <section id="view-settings" class="view"><div class="heading-row"><div><p class="eyebrow">PRIVATE BY DESIGN</p><h1>Settings</h1></div></div><div class="panel settings-panel"><div class="setting-row"><div><b>Data storage</b><span>Stored on this device in your browser. GitHub only contains app code.</span></div><span class="pill good">IndexedDB</span></div><div class="setting-row"><div><b>Display timezone</b><span>All setup times are shown in Pakistan Standard Time (PKT).</span></div><span class="pill">UTC+05:00</span></div><div class="setting-row"><div><b>Automatic drafts</b><span>Unfinished forms save on this device as you type.</span></div><span class="pill good">On</span></div><div class="backup-actions"><button class="secondary" id="backup-json">Export everything · JSON</button><button class="secondary" id="restore-json">Import backup · JSON</button><button class="secondary" id="export-csv">Export setups · CSV</button><input id="restore-file" type="file" accept="application/json,.json" hidden></div><p class="subtle">Restore validates the complete backup before replacing your current library. Export a backup before moving to another device.</p></div><div class="panel about"><span class="brand-mark">X</span><div><b>XAU Library <span class="pill">v1.0</span></b><p>Offline-ready XAUUSD journal. No account, server, or paid service.</p></div></div></section>
+  </main>
+  <nav class="bottom-nav" aria-label="Main navigation"><button class="nav-item active" data-view="library"><span>▦</span>Library</button><button class="nav-item add-nav" data-view="add"><span>＋</span>Add</button><button class="nav-item" data-view="stats"><span>◷</span>Stats</button><button class="nav-item" data-view="settings"><span>⚙</span>Settings</button></nav>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div><dialog id="detail-dialog" class="detail-dialog"></dialog>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
