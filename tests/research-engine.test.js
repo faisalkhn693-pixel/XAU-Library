@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { caseIdFor, normalizeCase, nextCaseSequence } from '../case-model.js';
+import { caseIdFor, cvdBucket, normalizeCase, nextCaseSequence } from '../case-model.js';
 import { findSimilarCases, similarityScore } from '../similarity.js';
 import { analyzeMistakes, discoverPatterns, runExperiment, summarize } from '../research-engine.js';
 
@@ -10,6 +10,18 @@ test('permanent case IDs are sequential and sequence advances past existing IDs'
   assert.equal(caseIdFor(1),'XAU-000001');
   assert.equal(nextCaseSequence([{caseId:'XAU-000009'}],4),10);
   assert.equal(nextCaseSequence([],12),12);
+});
+
+test('CVD buckets advance in 5k ranges and preserve open-ended 50k+ bucket',()=>{
+  assert.equal(cvdBucket(0),'0–5k');
+  assert.equal(cvdBucket(4999),'0–5k');
+  assert.equal(cvdBucket(5000),'5–10k');
+  assert.equal(cvdBucket(14999),'10–15k');
+  assert.equal(cvdBucket(15000),'15–20k');
+  assert.equal(cvdBucket(45000),'45–50k');
+  assert.equal(cvdBucket(50000),'50k+');
+  assert.equal(cvdBucket(-15000),'15–20k');
+  assert.equal(cvdBucket(''),'');
 });
 
 test('normalization adds research fields without mutating or dropping original fields',()=>{
@@ -56,3 +68,4 @@ test('experiments return matching cases without ranking them; mistakes aggregate
   assert.equal(result.summary.sampleSize,3);assert.equal(result.query.title,'London longs');assert.equal('rank' in result,false);
   const mistakes=analyzeMistakes(cases);assert.equal(mistakes[0].mistake,'Late entry');assert.equal(mistakes[0].summary.sampleSize,2);
 });
+
