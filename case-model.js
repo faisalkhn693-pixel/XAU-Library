@@ -15,11 +15,9 @@ export const DEFAULT_RESEARCH_CONFIG = Object.freeze({
 export function cvdBucket(raw) {
   if (raw === '' || raw == null || !Number.isFinite(Number(raw))) return '';
   const n = Math.abs(Number(raw));
-  if (n < 5000) return '0–5k';
-  if (n < 10000) return '5–10k';
-  if (n < 20000) return '10–20k';
-  if (n < 50000) return '20–50k';
-  return '50k+';
+  if (n >= 50000) return '50k+';
+  const lower=Math.floor(n/5000)*5;
+  return `${lower}–${lower+5}k`;
 }
 
 export function caseIdFor(sequence) {
@@ -86,3 +84,4 @@ export function snapshotForRevision(c) {
   delete snapshot.revisions;
   return snapshot;
 }
+
